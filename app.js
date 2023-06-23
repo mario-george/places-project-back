@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const placesRoutes = require("./routes/places-routes");
+const HttpError = require("./models/HttpError");
 const app = express();
 // middleware for all incoming requests
 // app.use
@@ -13,13 +14,22 @@ app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes);
 
+
+// default route not found error handler when other route called next(error)
+app.use((req, res, next) => {
+  const error = new HttpError("Couldn't find this route", 404);
+  return next(error);
+});
+
 // errorHandler middleware function have 4 parameters the first is error
 app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);
     // if you sent two responses it will cause error so we check if we sent a response if so we won't send a response again
   }
-  return res.status(error.code || 404).json(error.message || "Error has occurred");
+  return res
+    .status(error.code || 404)
+    .json({ message: error.message || "Error has occurred" });
 });
 
 app.listen(3003);

@@ -13,7 +13,9 @@ const router = express.Router();
 
 const placesController = require("../controllers/places");
 router.get("/:placeID", placesController.getPlaceById);
-router.get("/user/:userID",placesController.getPlaceByUserId);
+router.get("/user/:userID",placesController.getPlacesByUserId);
 router.get("/",placesController.getAllPlaces);
 router.post("/",placesController.createPlace)
+router.patch("/:pid",placesController.updatePlace)
+router.delete("/:pid",placesController.deletePlace)
 module.exports = router;
