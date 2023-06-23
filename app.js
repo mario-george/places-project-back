@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const placesRoutes = require("./routes/places-routes");
 const HttpError = require("./models/HttpError");
+const userRoutes= require("./routes/user-routes");
 const app = express();
 // middleware for all incoming requests
 // app.use
@@ -13,6 +14,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes);
+app.use("/api/users", userRoutes);
 
 
 // default route not found error handler when other route called next(error)
