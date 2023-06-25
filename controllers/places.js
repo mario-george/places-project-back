@@ -1,5 +1,7 @@
 const HttpError = require("../models/HttpError");
 const uuid = require("uuid");
+const { validationResult } = require("express-validator");
+
 let DummyPlaces = [
   { id: "p1", title: "empire state building", creator: "u1" },
   { id: "p2", title: "grand prismatic building", creator: "u2" },
@@ -39,6 +41,10 @@ const getAllPlaces = (req, res, next) => {
   return res.json({ places: DummyPlaces });
 };
 const createPlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpError("Invalid input please check your data", 422));
+  }
   const { title, address, creator, location, description } = req.body;
   const createdPlace = {
     id: uuid.v4(),
@@ -57,6 +63,10 @@ const createPlace = (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 const updatePlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpError("Invalid input please check your data", 422));
+  }
   const { title, description } = req.body;
   const updatedPlace = { ...DummyPlaces.find((p) => p.id === req.params.pid) };
   //   the spread operator takes a copy of all key value pairs of the object
@@ -75,6 +85,9 @@ const updatePlace = (req, res, next) => {
 };
 const deletePlace = (req, res, next) => {
   const deletedPlace = DummyPlaces.find((p) => p.id === req.params.pid);
+  if (!deletedPlace) {
+    return next(new HttpError("Place is not found", 404));
+  }
   DummyPlaces = DummyPlaces.filter((p) => p.id !== req.params.pid);
   return res.status(200).json({ message: "success", place: deletedPlace });
 };
