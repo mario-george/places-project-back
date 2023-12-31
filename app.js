@@ -1,13 +1,23 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+require("dotenv").config();
+// Loads the variables from .env into process.env
+
+const userRoutes = require("./routes/user-routes");
 const placesRoutes = require("./routes/places-routes");
 const HttpError = require("./models/HttpError");
-const userRoutes= require("./routes/user-routes");
+
 const app = express();
-// middleware for all incoming requests
+
+const url = process.env.DB_URI;
+// load the uri Database Uniform Resource Identifier.
+
 // app.use
-// middleware for specific http requests
+// middleware for all incoming requests
+
 // app.get app.post app.put app.delete app.patch
+// middleware for specific http requests
 
 // body-parser will parse the request body
 
@@ -15,7 +25,6 @@ app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);
-
 
 // default route not found error handler when other route called next(error)
 app.use((req, res, next) => {
@@ -34,4 +43,15 @@ app.use((error, req, res, next) => {
     .json({ message: error.message || "Error has occurred" });
 });
 
-app.listen(3003);
+mongoose
+  .connect(url)
+  .then(() => {
+    // Port number
+    const PORT = 5001;
+    app.listen(PORT, () => {
+      console.log(`Server is running and listening on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
