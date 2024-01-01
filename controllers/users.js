@@ -14,6 +14,8 @@ const DummyUsers = [
 const getAllUsers = async (req, res, next) => {
   let allUsers;
   try {
+    // -password means the field will not be returned with the doc js object only you can use "email name" to only return those fields
+
     allUsers = await User.find({}, "-password");
   } catch (err) {
     const error = new HttpError(
