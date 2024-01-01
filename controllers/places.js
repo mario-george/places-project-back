@@ -5,11 +5,6 @@ const HttpError = require("../models/HttpError");
 const Place = require("../models/place");
 const User = require("../models/user");
 
-let DummyPlaces = [
-  { id: "p1", title: "empire state building", creator: "u1" },
-  { id: "p2", title: "grand prismatic building", creator: "u2" },
-];
-
 const getPlacesByUserId = async (req, res, next) => {
   const { userID } = req.params;
   let places;
@@ -185,45 +180,55 @@ const updatePlace = async (req, res, next) => {
   res.json({ place: place.toObject({ getters: true }) });
 };
 const deletePlace = async (req, res, next) => {
+  const placeId = req.params.pid;
+
   let place;
   try {
-    // the populate method search the collection i already made a ref in the property of the model and populate the js doc with it
-
-    place = await Place.findById(req.params.pid).populate("creator");
+    place = await Place.findById(placeId).populate("creator");
   } catch (err) {
-    const e = new HttpError(
-      "Something went wrong while deleting the place",
+    const error = new HttpError(
+      "Something went wrong while fetching the place",
       500
     );
-    return next(e);
+    return next(error);
   }
 
   if (!place) {
-    const e = new HttpError("Could not find a place with that id", 404);
-    return next(e);
+    const error = new HttpError("Place not found for this id", 404);
+    return next(error);
   }
 
+  const creator = place.creator;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const sess = await mongoose.startSession();
-    sess.startTransaction();
-    await place.remove({ session: sess });
+    // Removing the reference from the creator's 'places' array
+    creator.places.pull(place);
+    await creator.save({ session });
 
-    // the pull method in mongoose takes the document and it will remove the id only from the array of places
+    // Removing the place itself
+    await Place.deleteOne({ _id: placeId }).session(session);
 
-    await place.creator.places.pull(place);
-
-    await place.creator.save({ session: sess });
-    sess.commitTransaction();
+    await session.commitTransaction();
   } catch (err) {
-    const e = new HttpError(
+    await session.abortTransaction();
+    session.endSession();
+
+    console.log(err);
+    const error = new HttpError(
       "Something went wrong while deleting the place",
       500
     );
-    return next(e);
+    return next(error);
   }
 
+  session.endSession();
   res.status(200).json({ message: "Place Deleted" });
 };
+
+
 exports.createPlace = createPlace;
 exports.getPlaceById = getPlaceById;
 exports.getPlacesByUserId = getPlacesByUserId;
