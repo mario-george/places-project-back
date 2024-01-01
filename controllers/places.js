@@ -3,33 +3,44 @@ const uuid = require("uuid");
 const { validationResult } = require("express-validator");
 const Place = require("../models/place");
 
-
 let DummyPlaces = [
   { id: "p1", title: "empire state building", creator: "u1" },
   { id: "p2", title: "grand prismatic building", creator: "u2" },
-]; 
+];
 
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const { userID } = req.params;
-  //   .find on an array will return the first element that pass the check
-  /*  const place = DummyPlaces.find((place) => {
-    return place.creator === userID;
-  }); */
-
-  const places = DummyPlaces.filter((p) => p.id === userID);
+  let places;
+  try {
+    places = await Place.find({ creator: userID });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching places from the user failed, please try again later",
+      500
+    );
+    return next(error);
+  }
   if (!places || places.length === 0) {
     // return res.json({ message: "Place not found by this user" });
     const error = new HttpError("This user has no places found", 404);
     return next(error);
-  } else {
-    return res.json({ places });
   }
-};
-const getPlaceById = (req, res, next) => {
-  const placeID = req.params.placeID;
-  const place = DummyPlaces.find((place) => {
-    return place.id === placeID;
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
   });
+};
+const getPlaceById = async (req, res, next) => {
+  const placeID = req.params.placeID;
+  let place;
+  try {
+    place = await Place.findById(placeID);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a place.",
+      500
+    );
+    return next(error);
+  }
   //  sending more than one response will cause an error so you need to return which is return next(error) instead
   if (!place) {
     // return res.json({ message: "Place not found" });
@@ -66,12 +77,12 @@ const createPlace = async (req, res, next) => {
     await createdPlace.save();
   } catch (err) {
     const error = new HttpError(
-      'Creating place failed, please try again.',
+      "Creating place failed, please try again.",
       500
     );
     return next(error);
   }
-  
+
   res.status(201).json({ place: createdPlace });
 };
 const updatePlace = (req, res, next) => {
