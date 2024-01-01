@@ -1,7 +1,9 @@
-const HttpError = require("../models/HttpError");
-const uuid = require("uuid");
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
+
+const HttpError = require("../models/HttpError");
 const Place = require("../models/place");
+const User = require("../models/user");
 
 let DummyPlaces = [
   { id: "p1", title: "empire state building", creator: "u1" },
@@ -71,10 +73,54 @@ const createPlace = async (req, res, next) => {
     image:
       "https://www.google.com/url?sa=i&url=https%3A%2F%2Fmodii.org%2Fen%2Frandom-2%2F&psig=AOvVaw0Xss2aQHfSj_5crXbv5ZlX&ust=1704185181917000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPihu9nmu4MDFQAAAAAdAAAAABAD",
   });
+
   // default normal success  status code is 200
   // 201 means it created something successfully
 
   // unshift() will push the element at the first place of the array not the last like push
+
+  // check the _id of the creator is found in the collection of users or not
+
+  let user;
+  try {
+    user = await User.findById(creator);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong , please try again.",
+      500
+    );
+    return next(error);
+  }
+  if (!user) {
+    return next(
+      new HttpError("Could not find the creator by the given id.", 404)
+    );
+  }
+
+  try {
+    /* 
+sessions and transactions are a way to do more than one thing at the same time if one fails the whole operations will fail
+
+*/
+
+    const sess = await mongoose.startSession();
+    await sess.startTransaction();
+    await createdPlace.save({ session: sess });
+
+    user.places.push(createdPlace);
+    // mongoose won't push the whole js document like you would do using normal js arrays but only the _id of the place to the array
+
+    await user.save({ session: sess });
+
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong , please try again.",
+      500
+    );
+    return next(error);
+  }
+
   try {
     await createdPlace.save();
   } catch (err) {
