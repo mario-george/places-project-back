@@ -47,7 +47,7 @@ mongoose
   .connect(url)
   .then(() => {
     // Port number
-    const PORT = 5001;
+    const PORT = 3003;
     app.listen(PORT, () => {
       console.log(`Server is running and listening on port ${PORT}`);
     });
