@@ -1,6 +1,9 @@
-const HttpError = require("../models/HttpError");
 const uuid = require("uuid");
 const { validationResult } = require("express-validator");
+
+const HttpError = require("../models/HttpError");
+const User = require("../models/user");
+
 const DummyUsers = [
   {
     id: "u1",
@@ -9,8 +12,20 @@ const DummyUsers = [
     password: "testpassword",
   },
 ];
-const getAllUsers = (req, res, next) => {
-  res.status(200).json({ users: DummyUsers });
+const getAllUsers = async (req, res, next) => {
+  let allUsers;
+  try {
+    allUsers = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError(
+      "Getting users failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+  res.json({
+    allUsers: allUsers.map((user) => user.toObject({ getters: true })),
+  });
 };
 const signup = (req, res, next) => {
   const { email, password, name } = req.body;
