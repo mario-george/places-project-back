@@ -54,8 +54,26 @@ const getPlaceById = async (req, res, next) => {
     return res.json({ place });
   }
 };
-const getAllPlaces = (req, res, next) => {
-  return res.json({ places: DummyPlaces });
+const getAllPlaces = async (req, res, next) => {
+  let places;
+  try {
+    places = await Place.find();
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching places failed, please try again later",
+      500
+    );
+    return next(error);
+  }
+
+  if (!places || places.length === 0) {
+    const error = new HttpError("No places found", 404);
+    return next(error);
+  }
+
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+  });
 };
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
