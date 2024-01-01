@@ -3,6 +3,8 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const Schema = mongoose.Schema;
 
+// instantriating a schema from the Schema class
+
 const userSchema = new Schema({
   name: { type: String, required: true },
   password: { type: String, required: true, minlength: 6 },
