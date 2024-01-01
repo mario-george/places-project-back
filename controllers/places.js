@@ -187,7 +187,9 @@ const updatePlace = async (req, res, next) => {
 const deletePlace = async (req, res, next) => {
   let place;
   try {
-    place = await Place.findById(req.params.pid);
+    // the populate method search the collection i already made a ref in the property of the model and populate the js doc with it
+
+    place = await Place.findById(req.params.pid).populate("creator");
   } catch (err) {
     const e = new HttpError(
       "Something went wrong while deleting the place",
@@ -195,8 +197,23 @@ const deletePlace = async (req, res, next) => {
     );
     return next(e);
   }
+
+  if (!place) {
+    const e = new HttpError("Could not find a place with that id", 404);
+    return next(e);
+  }
+
   try {
-    await place.remove();
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await place.remove({ session: sess });
+
+    // the pull method in mongoose takes the document and it will remove the id only from the array of places
+
+    await place.creator.places.pull(place);
+
+    await place.creator.save({ session: sess });
+    sess.commitTransaction();
   } catch (err) {
     const e = new HttpError(
       "Something went wrong while deleting the place",
