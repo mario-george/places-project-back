@@ -25,6 +25,8 @@ const getPlacesByUserId = async (req, res, next) => {
     const error = new HttpError("This user has no places found", 404);
     return next(error);
   }
+
+  // mapped the array to use the toObject on each element of the places of the user
   res.json({
     places: places.map((place) => place.toObject({ getters: true })),
   });
@@ -118,13 +120,28 @@ const updatePlace = async (req, res, next) => {
 
   res.json({ place: place.toObject({ getters: true }) });
 };
-const deletePlace = (req, res, next) => {
-  const deletedPlace = DummyPlaces.find((p) => p.id === req.params.pid);
-  if (!deletedPlace) {
-    return next(new HttpError("Place is not found", 404));
+const deletePlace = async (req, res, next) => {
+  let place;
+  try {
+    place = await Place.findById(req.params.pid);
+  } catch (err) {
+    const e = new HttpError(
+      "Something went wrong while deleting the place",
+      500
+    );
+    return next(e);
   }
-  DummyPlaces = DummyPlaces.filter((p) => p.id !== req.params.pid);
-  return res.status(200).json({ message: "success", place: deletedPlace });
+  try {
+    await place.remove();
+  } catch (err) {
+    const e = new HttpError(
+      "Something went wrong while deleting the place",
+      500
+    );
+    return next(e);
+  }
+
+  res.status(200).json({ message: "Place Deleted" });
 };
 exports.createPlace = createPlace;
 exports.getPlaceById = getPlaceById;
