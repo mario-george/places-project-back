@@ -10,9 +10,12 @@ const userSchema = new Schema({
   password: { type: String, required: true, minlength: 6 },
   image: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  places: { type: String, required: true },
+  places: [{ type: mongoose.Types.ObjectId, required: true ,ref:'Place'}],
 });
-
+/* 
+The mongoose-unique-validator plugin is an additional layer
+ that helps to improve the error messages related to unique constraints. 
+*/
 userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("User", userSchema);
