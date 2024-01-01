@@ -7,9 +7,9 @@ const User = require("../models/user");
 
 const getPlacesByUserId = async (req, res, next) => {
   const { userID } = req.params;
-  let places;
+  let userPopulatedWithPlaces;
   try {
-    places = await Place.find({ creator: userID });
+    userPopulatedWithPlaces = await User.findById(userID).populate("places");
   } catch (err) {
     const error = new HttpError(
       "Fetching places from the user failed, please try again later",
@@ -17,7 +17,7 @@ const getPlacesByUserId = async (req, res, next) => {
     );
     return next(error);
   }
-  if (!places || places.length === 0) {
+  if (!userPopulatedWithPlaces || userPopulatedWithPlaces.places.length === 0) {
     // return res.json({ message: "Place not found by this user" });
     const error = new HttpError("This user has no places found", 404);
     return next(error);
@@ -25,7 +25,9 @@ const getPlacesByUserId = async (req, res, next) => {
 
   // mapped the array to use the toObject on each element of the places of the user
   res.json({
-    places: places.map((place) => place.toObject({ getters: true })),
+    places: userPopulatedWithPlaces.places.map((place) =>
+      place.toObject({ getters: true })
+    ),
   });
 };
 const getPlaceById = async (req, res, next) => {
@@ -227,7 +229,6 @@ const deletePlace = async (req, res, next) => {
   session.endSession();
   res.status(200).json({ message: "Place Deleted" });
 };
-
 
 exports.createPlace = createPlace;
 exports.getPlaceById = getPlaceById;
