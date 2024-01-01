@@ -1,4 +1,3 @@
-const uuid = require("uuid");
 const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/HttpError");
@@ -68,16 +67,50 @@ const signup = async (req, res, next) => {
   }
   res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = DummyUsers.find((u) => u.email === email);
-  if (!user || user.password !== password) {
-    return next(new HttpError("Wrong credentials please try again", 401));
-    // 401 means auth failed
+  let loggedInUser;
+
+  try {
+    loggedInUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Logging in failed, please try again later.",
+      500
+    );
+    return next(error);
   }
-  res.json({ message: "Login successful" });
+
+  if (!loggedInUser || loggedInUser.password !== password) {
+    const error = new HttpError(
+      "Invalid credentials, could not log you in.",
+      401
+    );
+    // 401 status code means auth failed
+    return next(error);
+  }
+
+  res.json({ message: "Logged in!" });
 };
 
 exports.getAllUsers = getAllUsers;
 exports.login = login;
 exports.signup = signup;
+
+/* 
+
+in mongoose 
+
+.find
+
+find by any property of the document object . it will always return an array even if it is only one document
+
+.findOne
+
+return the first element that satisfies the property value
+
+.findById 
+
+takes the _id property of the document object and returns the whole document object
+
+*/
