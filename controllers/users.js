@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/HttpError");
 const User = require("../models/user");
@@ -67,7 +68,18 @@ const signup = async (req, res, next) => {
     const error = new HttpError("Signing up failed, please try again.", 500);
     return next(error);
   }
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  const token = jwt.sign(
+    { userId: newUser.id, email: newUser.email },
+    process.env.JWT_KEY,
+    { expiresIn: "1h" }
+  );
+  res
+    .json({
+      userId: newUser.id,
+      email: newUser.email,
+      token: token,
+    })
+    .status(201);
 };
 const login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -88,11 +100,21 @@ const login = async (req, res, next) => {
       "Invalid credentials, could not log you in.",
       401
     );
-    // 401 status code means auth failed
     return next(error);
   }
 
-  res.json({ message: "Logged in!" });
+  //  jsonwebtoken library  creates a JWT that includes the user's ID and email.
+  const token = jwt.sign(
+    { userId: loggedInUser.id, email: loggedInUser.email },
+    process.env.JWT_KEY,
+    { expiresIn: "1h" }
+  );
+
+  res.json({
+    userId: loggedInUser.id,
+    email: loggedInUser.email,
+    token: token,
+  });
 };
 
 exports.getAllUsers = getAllUsers;
