@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const HttpError = require("../models/HttpError");
 const User = require("../models/user");
 
-
 const getAllUsers = async (req, res, next) => {
   let allUsers;
   try {
@@ -62,14 +61,14 @@ const signup = async (req, res, next) => {
     return next(error);
   }
   const token = jwt.sign(
-    { userId: newUser.id, email: newUser.email },
+    { userId: createdUser.id, email: createdUser.email },
     process.env.JWT_KEY,
     { expiresIn: "1h" }
   );
   res
     .json({
-      userId: newUser.id,
-      email: newUser.email,
+      userId: createdUser.id,
+      email: createdUser.email,
       token: token,
     })
     .status(201);
