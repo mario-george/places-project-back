@@ -19,6 +19,11 @@ const fileUpload = multer({
     const ext = mimeTypeMapperToExt[file.mimetype];
     cb(null, uuid.v4() + "." + ext);
   },
+  fileFilter: (req, file, callback) => {
+    const isValid = !!mimeTypeMapperToExt[file.mimetype]; // will be true if the mimetype is in the object
+    let error = isValid ? null : new Error("Wrong Mime Type detected");
+    callback(error, isValid);
+  },
 });
 /* 
 limits:500000 is a built in multer function that will limit the size of the file to 500000 bytes
