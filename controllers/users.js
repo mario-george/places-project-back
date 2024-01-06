@@ -50,8 +50,7 @@ const signup = async (req, res, next) => {
     password: password,
     name: name,
     places: [],
-    image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fin.cdgdbentre.edu.vn%2Frandom-anime-character-qbx135oe%2F&psig=AOvVaw1ciu2tyNyfhJBew5LB-gTZ&ust=1704191831767000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCLjbj7n_u4MDFQAAAAAdAAAAABAJ",
+    image:req.file.path
   });
 
   try {
