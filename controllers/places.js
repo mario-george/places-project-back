@@ -85,8 +85,7 @@ const createPlace = async (req, res, next) => {
     creator: creator,
     location: location,
     description: description,
-    image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fmodii.org%2Fen%2Frandom-2%2F&psig=AOvVaw0Xss2aQHfSj_5crXbv5ZlX&ust=1704185181917000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPihu9nmu4MDFQAAAAAdAAAAABAD",
+    image:req.file.path
   });
 
   // default normal success  status code is 200
