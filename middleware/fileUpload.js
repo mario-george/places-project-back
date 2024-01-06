@@ -10,15 +10,17 @@ const mimeTypeMapperToExt = {
 // multer (group of middlewares) takes a config object to set it
 // dest: 'uploads/images' is a built in multer function that will create a folder called uploads and inside it a folder called images and will store the images there
 const fileUpload = multer({
-  destination: (req, file, callback) => {
-    // specify destunation of the images
-    callback(null, "uploads/images");
-  },
-  filename: (req, file, cb) => {
-    // specify the name of the images to be random
-    const ext = mimeTypeMapperToExt[file.mimetype];
-    cb(null, uuid.v4() + "." + ext);
-  },
+  storage: multer.diskStorage({
+    destination: (req, file, callback) => {
+      // specify destunation of the images
+      callback(null, "uploads/images");
+    },
+    filename: (req, file, cb) => {
+      // specify the name of the images to be random
+      const ext = mimeTypeMapperToExt[file.mimetype];
+      cb(null, uuid.v4() + "." + ext);
+    },
+  }),
   fileFilter: (req, file, callback) => {
     const isValid = !!mimeTypeMapperToExt[file.mimetype]; // will be true if the mimetype is in the object
     let error = isValid ? null : new Error("Wrong Mime Type detected");
