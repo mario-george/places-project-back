@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const HttpError = require("../models/HttpError");
 const User = require("../models/user");
@@ -45,12 +46,22 @@ const signup = async (req, res, next) => {
     );
     return next(error);
   }
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 13);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not create user, please try again.",
+      500
+    );
+    return next(error);
+  }
   const createdUser = new User({
     email: email,
-    password: password,
+    password: hashedPassword,
     name: name,
     places: [],
-    image:req.file.path
+    image: req.file.path,
   });
 
   try {
@@ -86,7 +97,7 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  if (!loggedInUser || loggedInUser.password !== password) {
+  if (!loggedInUser) {
     const error = new HttpError(
       "Invalid credentials, could not log you in.",
       401
@@ -94,6 +105,21 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
+  let passwordValid = false;
+  try {
+    passwordValid = await bcrypt.compare(password, loggedInUser.password);
+  } catch (err) {
+    const error = new HttpError("Could not log you in, please try again.", 500);
+    return next(error);
+  }
+
+  if (!passwordValid) {
+    const error = new HttpError(
+      "Invalid credentials, could not log you in.",
+      401
+    );
+    return next(error);
+  }
   //  jsonwebtoken library  creates a JWT that includes the user's ID and email.
   const token = jwt.sign(
     { userId: loggedInUser.id, email: loggedInUser.email },
