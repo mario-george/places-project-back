@@ -1,11 +1,16 @@
 const express = require("express");
+const { check } = require("express-validator");
+
+const fileUpload = require("../middleware/fileUpload");
 const router = express.Router();
 const userController = require("../controllers/users");
-const { check } = require("express-validator");
+
 router.get("/", userController.getAllUsers);
 // middleware functions can take as many arguments and it will execute them from left to right
+//
 router.post(
   "/signup",
+  fileUpload.single("image"),
   [
     check("name").not().isEmpty(),
     check("password").isLength({ min: 5 }),

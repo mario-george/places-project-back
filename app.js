@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -23,6 +26,9 @@ const url = process.env.DB_URI;
 
 app.use(bodyParser.json());
 
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
+
 app.use((req, res, next) => {
   // in order to avoid CORS error which happens in the browser(postman won't give that error) which means the request from the font end has to come from the same domain of the backend in this case localhost:3003
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -46,6 +52,11 @@ app.use((req, res, next) => {
 
 // errorHandler middleware function have 4 parameters the first is error
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (errorUnlink) => {
+      console.log(errorUnlink);
+    });
+  }
   if (res.headerSent) {
     return next(error);
     // if you sent two responses it will cause error so we check if we sent a response if so we won't send a response again
