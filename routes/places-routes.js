@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
+const fileUpload = require("../middleware/fileUpload");
 const { check } = require("express-validator");
+
 // it takes a filter or route if it reaches the route it will execute the function in the second parameter
 // REST API exchanges data with json format
 
@@ -18,6 +20,8 @@ router.get("/user/:userID", placesController.getPlacesByUserId);
 router.get("/", placesController.getAllPlaces);
 router.post(
   "/",
+  fileUpload.single("image"),
+
   [
     check("title").not().isEmpty(),
     check("description").isLength({ min: 5 }),
