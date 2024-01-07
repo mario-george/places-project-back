@@ -1,9 +1,11 @@
 const express = require("express");
+const { check } = require("express-validator");
+
 const router = express.Router();
 
 const fileUpload = require("../middleware/fileUpload");
-const { check } = require("express-validator");
-
+const placesController = require("../controllers/places");
+const authHandler = require("../middleware/authHandler");
 // it takes a filter or route if it reaches the route it will execute the function in the second parameter
 // REST API exchanges data with json format
 
@@ -14,9 +16,12 @@ const { check } = require("express-validator");
 }); */
 // ctrl shift a multi line comment
 
-const placesController = require("../controllers/places");
 router.get("/:placeID", placesController.getPlaceById);
 router.get("/user/:userID", placesController.getPlacesByUserId);
+
+// the routes after this will require authentication with a valid token
+app.use(authHandler);
+
 router.get("/", placesController.getAllPlaces);
 router.post(
   "/",
