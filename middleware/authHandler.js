@@ -18,6 +18,8 @@ const authHandler = (req, res, next) => {
     
     // attach a property to the request object that contains the user's ID 
     req.userData = { userId: tokenDecoded.userId };
+
+    //continue to next middleware
     next();
   } catch (err) {
     const error = new HttpError("Authentication failed!", 403);
