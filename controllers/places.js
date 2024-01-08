@@ -85,7 +85,7 @@ const createPlace = async (req, res, next) => {
     creator: creator,
     location: location,
     description: description,
-    image:req.file.path
+    image: req.file.path,
   });
 
   // default normal success  status code is 200
@@ -96,8 +96,9 @@ const createPlace = async (req, res, next) => {
   // check the _id of the creator is found in the collection of users or not
 
   let user;
+
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError(
       "Something went wrong , please try again.",
@@ -114,9 +115,10 @@ const createPlace = async (req, res, next) => {
   try {
     /* 
 sessions and transactions are a way to do more than one thing at the same time if one fails the whole operations will fail
-
+t error = new HttpError(
+      "Something went wrong , please try again.",
 */
-
+    console.log("start");
     const sess = await mongoose.startSession();
     await sess.startTransaction();
     await createdPlace.save({ session: sess });
@@ -128,18 +130,10 @@ sessions and transactions are a way to do more than one thing at the same time i
 
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
+
     const error = new HttpError(
       "Something went wrong , please try again.",
-      500
-    );
-    return next(error);
-  }
-
-  try {
-    await createdPlace.save();
-  } catch (err) {
-    const error = new HttpError(
-      "Creating place failed, please try again.",
       500
     );
     return next(error);
