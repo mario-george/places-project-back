@@ -20,7 +20,7 @@ router.get("/:placeID", placesController.getPlaceById);
 router.get("/user/:userID", placesController.getPlacesByUserId);
 
 // the routes after this will require authentication with a valid token
-app.use(authHandler);
+router.use(authHandler);
 
 router.get("/", placesController.getAllPlaces);
 router.post(
