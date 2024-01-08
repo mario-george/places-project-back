@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/HttpError");
 
 const authHandler = (req, res, next) => {
   // there is a traditional action by the browser which it sends a request to the server to check if the server allows the request to be sent and attaching OPTIONS method to the request
