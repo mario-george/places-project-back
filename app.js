@@ -38,7 +38,7 @@ const url = process.env.DB_URI;
 
 app.use(bodyParser.json());
 
-app.use("/uploads/images", express.static(path.join("uploads", "images")));
+// app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);
