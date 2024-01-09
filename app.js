@@ -12,6 +12,17 @@ const placesRoutes = require("./routes/places-routes");
 const HttpError = require("./models/HttpError");
 
 const app = express();
+app.use((req, res, next) => {
+  // in order to avoid CORS error which happens in the browser(postman won't give that error) which means the request from the font end has to come from the same domain of the backend in this case localhost:3003
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+
+  next();
+});
 
 const url = process.env.DB_URI;
 // load the uri Database Uniform Resource Identifier.
@@ -29,17 +40,6 @@ app.use(bodyParser.json());
 app.use('/uploads/images', express.static(path.join('uploads', 'images')));
 
 
-app.use((req, res, next) => {
-  // in order to avoid CORS error which happens in the browser(postman won't give that error) which means the request from the font end has to come from the same domain of the backend in this case localhost:3003
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
-
-  next();
-});
 
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);
