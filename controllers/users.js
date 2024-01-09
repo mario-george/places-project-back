@@ -75,13 +75,13 @@ const signup = async (req, res, next) => {
     process.env.JWT_KEY,
     { expiresIn: "1h" }
   );
-  res
-    .json({
+  res.status(201).send(
+    JSON.stringify({
       userId: createdUser.id,
       email: createdUser.email,
       token: token,
     })
-    .status(201);
+  );
 };
 const login = async (req, res, next) => {
   const { email, password } = req.body;
