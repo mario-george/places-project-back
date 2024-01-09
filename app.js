@@ -1,5 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
+const cors = require('cors');
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -23,7 +24,7 @@ app.use((req, res, next) => {
 
   next();
 });
-
+app.use(cors());
 const url = process.env.DB_URI;
 // load the uri Database Uniform Resource Identifier.
 
@@ -37,9 +38,7 @@ const url = process.env.DB_URI;
 
 app.use(bodyParser.json());
 
-app.use('/uploads/images', express.static(path.join('uploads', 'images')));
-
-
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);
