@@ -1,16 +1,20 @@
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { v4: uuidv4 } = require('uuid');
 const multer = require("multer");
 const multerS3 = require("multer-s3");
-const aws = require("aws-sdk");
-const uuid = require("uuid");
 
-aws.config.update({
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  region: process.env.AWS_REGION,
-  sessionToken: process.env.AWS_SESSION_TOKEN,
+// Set the AWS Region
+const REGION = process.env.AWS_REGION;
+
+// Create an Amazon S3 service client object.
+const s3 = new S3Client({ 
+  region: REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    sessionToken: process.env.AWS_SESSION_TOKEN
+  }
 });
-
-const s3 = new aws.S3();
 
 const mimeTypeMapperToExt = {
   "image/png": "png",
@@ -28,7 +32,7 @@ const fileUpload = multer({
     },
     key: function (req, file, cb) {
       const ext = mimeTypeMapperToExt[file.mimetype];
-      cb(null, uuid.v4() + "." + ext);
+      cb(null, uuidv4() + "." + ext);
     },
   }),
   fileFilter: (req, file, callback) => {
