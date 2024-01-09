@@ -101,7 +101,10 @@ const createPlace = async (req, res, next) => {
       lng: latLng.longitude ||0 ,
     },
     description: description,
-    image: req.file.path,
+    // multer image path
+    // image: req.file.path,
+    image: req.file.location, 
+    //  aws s3 image path
   });
 
   // default normal success  status code is 200
