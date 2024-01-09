@@ -1,7 +1,7 @@
 const express = require("express");
 const { check } = require("express-validator");
 
-const fileUpload = require("../middleware/fileUpload");
+const fileUpload = require("../middleware/AwsS3");
 const router = express.Router();
 const userController = require("../controllers/users");
 
