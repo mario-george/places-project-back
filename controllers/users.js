@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const HttpError = require("../models/HttpError");
 const User = require("../models/user");
-const getFile = require("../middleware/helper/presignedURL");
+const { getFile } = require("../middleware/AwsS3");
 
 const getAllUsers = async (req, res, next) => {
   let allUsers;
@@ -19,10 +19,10 @@ const getAllUsers = async (req, res, next) => {
     );
     return next(error);
   }
-  const imagePresignedAllUsers = allUsers.map((u) => {
-    return { ...u.toObject({ getters: true }), image: getFile(u.image) };
-  });
-  res.json({allUsers:imagePresignedAllUsers});
+  const imagePresignedAllUsers = await Promise.all(allUsers.map(async(u) => {
+    return { ...u.toObject({ getters: true }), image: await getFile(u.image) };
+  }));
+  res.json({ allUsers: imagePresignedAllUsers });
 };
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
@@ -59,7 +59,7 @@ const signup = async (req, res, next) => {
     return next(error);
   }
   let imageURL = req.file?.location;
-  if (process.env.DEV) {
+  if (process.env.DEV ==="true") {
     imageURL = req.file?.path;
   }
   console.log(imageURL);
