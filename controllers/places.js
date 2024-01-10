@@ -92,7 +92,7 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
   let imageURL = req.file?.location;
-  if (process.env.DEV) {
+  if (process.env.DEV==="true") {
     imageURL = req.file?.path;
   }
   const createdPlace = new Place({
