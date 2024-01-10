@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.485.0",
+    "@aws-sdk/s3-request-presigner": "^3.485.0",
     "aws-sdk": "^2.1532.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -27,6 +28,7 @@
     "multer-s3": "^3.0.1",
     "node-geocoder": "^4.2.0",
     "nodemon": "^3.0.2",
+    "s3": "^2.0.0",
     "uuid": "^9.0.0"
   }
 }
