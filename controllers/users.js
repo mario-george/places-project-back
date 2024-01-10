@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const HttpError = require("../models/HttpError");
 const User = require("../models/user");
+const getFile = require("../middleware/helper/presignedURL");
 
 const getAllUsers = async (req, res, next) => {
   let allUsers;
@@ -18,6 +19,9 @@ const getAllUsers = async (req, res, next) => {
     );
     return next(error);
   }
+  const imagePresignedAllUsers = allUsers.map((u) => {
+    return { ...u.toObject({ getters: true }), image: getFile(u.image) };
+  });
   res.json({
     allUsers: allUsers.map((user) => user.toObject({ getters: true })),
   });
