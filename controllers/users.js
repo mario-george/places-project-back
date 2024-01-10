@@ -56,18 +56,25 @@ const signup = async (req, res, next) => {
     );
     return next(error);
   }
+let imageURL = req.file?.location;
+  if (process.env.DEV){
+    imageURL= req.file?.path,
+
+  }
+  console.log(imageURL)
   const createdUser = new User({
     email: email,
     password: hashedPassword,
     name: name,
     places: [],
-    image: req.file?.path || null,
+    image: imageURL,
   });
 
   try {
     await createdUser.save();
   } catch (err) {
     const error = new HttpError("Signing up failed, please try again.", 500);
+    error.err = err;
     return next(error);
   }
   const token = jwt.sign(
