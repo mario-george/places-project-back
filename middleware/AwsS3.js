@@ -48,14 +48,12 @@ const fileUpload = multer({
 });
 
 async function getFile(url) {
-  console.log("URL:", url);
   const command = new GetObjectCommand({
     Bucket: "cyclic-cobalt-blue-seal-sock-ca-central-1",
-    Key: "81c35405-9a16-4c42-9f28-b6a0561e5170.png",
+    Key: url.split(".amazonaws.com/")[1],
   });
 
   const signedUrl = await getSignedUrl(s3, command); // URL expires in 1 hour
-  console.log(signedUrl);
   return signedUrl;
 }
 exports.getFile = getFile;
