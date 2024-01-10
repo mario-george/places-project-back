@@ -26,6 +26,7 @@ const fileUpload = multer({
   storage: multerS3({
     s3: s3,
     bucket: "cyclic-cobalt-blue-seal-sock-ca-central-1",
+    acl: 'public-read',
     metadata: function (req, file, cb) {
       cb(null, { fieldName: file.fieldname });
     },
