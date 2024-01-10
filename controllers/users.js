@@ -22,9 +22,7 @@ const getAllUsers = async (req, res, next) => {
   const imagePresignedAllUsers = allUsers.map((u) => {
     return { ...u.toObject({ getters: true }), image: getFile(u.image) };
   });
-  res.json({
-    allUsers: allUsers.map((user) => user.toObject({ getters: true })),
-  });
+  res.json(imagePresignedAllUsers);
 };
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
