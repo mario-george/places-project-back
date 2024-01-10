@@ -6,6 +6,8 @@ const Place = require("../models/place");
 const User = require("../models/user");
 const getGeocodingData = require("../middleware/latLngExtraction");
 
+const { getFile } = require("../middleware/AwsS3");
+
 const getPlacesByUserId = async (req, res, next) => {
   const { userID } = req.params;
   let userPopulatedWithPlaces;
@@ -23,12 +25,17 @@ const getPlacesByUserId = async (req, res, next) => {
     const error = new HttpError("This user has no places found", 404);
     return next(error);
   }
-
+  const placesWithPresignedURLs = await Promise.all(
+    userPopulatedWithPlaces.places.map(async (place) => {
+      return {
+        ...place.toObject({ getters: true }),
+        image: await getFile(place.image),
+      };
+    })
+  );
   // mapped the array to use the toObject on each element of the places of the user
   res.json({
-    places: userPopulatedWithPlaces.places.map((place) =>
-      place.toObject({ getters: true })
-    ),
+    places: placesWithPresignedURLs,
   });
 };
 const getPlaceById = async (req, res, next) => {
