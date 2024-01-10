@@ -51,11 +51,11 @@ app.use((req, res, next) => {
 
 // errorHandler middleware function have 4 parameters the first is error
 app.use((error, req, res, next) => {
-  if (req.file) {
-    fs.unlink(req.file.path, (errorUnlink) => {
-      console.log(errorUnlink);
-    });
-  }
+  // if (req.file) {
+  //   fs.unlink(req.file.path, (errorUnlink) => {
+  //     console.log(errorUnlink);
+  //   });
+  // }
   if (res.headerSent) {
     return next(error);
     // if you sent two responses it will cause error so we check if we sent a response if so we won't send a response again

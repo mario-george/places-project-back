@@ -249,9 +249,9 @@ const deletePlace = async (req, res, next) => {
 
   session.endSession();
 
-  fs.unlink(place.image, err => {
-    console.log(err);
-  });
+  // fs.unlink(place.image, err => {
+  //   console.log(err);
+  // });
   res.status(200).json({ message: "Place Deleted" });
 };
 
