@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const cors = require('cors');
+const cors = require("cors");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -12,7 +12,7 @@ const userRoutes = require("./routes/user-routes");
 const placesRoutes = require("./routes/places-routes");
 const HttpError = require("./models/HttpError");
 
-const isDev = process.env.DEV === 'true';
+const isDev = process.env.DEV === "true";
 const app = express();
 
 app.use((req, res, next) => {
@@ -41,7 +41,7 @@ const url = process.env.DB_URI;
 app.use(bodyParser.json());
 if (isDev) {
   app.use("/uploads/images", express.static(path.join("uploads", "images")));
-}   
+}
 
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);

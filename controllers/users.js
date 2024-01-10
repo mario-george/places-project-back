@@ -56,12 +56,11 @@ const signup = async (req, res, next) => {
     );
     return next(error);
   }
-let imageURL = req.file?.location;
-  if (process.env.DEV){
-    imageURL= req.file?.path,
-
+  let imageURL = req.file?.location;
+  if (process.env.DEV) {
+    imageURL = req.file?.path;
   }
-  console.log(imageURL)
+  console.log(imageURL);
   const createdUser = new User({
     email: email,
     password: hashedPassword,
