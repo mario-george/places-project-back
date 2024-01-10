@@ -91,8 +91,14 @@ const createPlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  if (latLng.latitude === undefined || latLng.longitude === undefined) {
+    const error = new HttpError("Invalid Address, Enter a valid address.", 500);
+    return next(error);
+  }
+
   let imageURL = req.file?.location;
-  if (process.env.DEV==="true") {
+  if (process.env.DEV === "true") {
     imageURL = req.file?.path;
   }
   const createdPlace = new Place({
