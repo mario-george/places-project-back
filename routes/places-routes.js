@@ -3,7 +3,7 @@ const { check } = require("express-validator");
 
 const router = express.Router();
 
-const {fileUpload} = require("../middleware/AwsS3");
+const { fileUpload } = require("../middleware/AwsS3");
 const placesController = require("../controllers/places");
 const authHandler = require("../middleware/authHandler");
 // it takes a filter or route if it reaches the route it will execute the function in the second parameter
@@ -36,7 +36,7 @@ router.post(
 );
 router.patch(
   "/:pid",
-  [check("description").isLength({ min: 5 }), check("title").not().isEmpty],
+  [check("description").isLength({ min: 5 }), check("title").not().isEmpty()],
   placesController.updatePlace
 );
 router.delete("/:pid", placesController.deletePlace);
