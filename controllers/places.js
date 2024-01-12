@@ -70,14 +70,21 @@ const getAllPlaces = async (req, res, next) => {
     );
     return next(error);
   }
-
+  const placesWithPresignedURLs = await Promise.all(
+    places.map(async (place) => {
+      return {
+        ...place.toObject({ getters: true }),
+        image: await getFile(place.image),
+      };
+    })
+  );
   if (!places || places.length === 0) {
     const error = new HttpError("No places found", 404);
     return next(error);
   }
 
   res.json({
-    places: places.map((place) => place.toObject({ getters: true })),
+    places: placesWithPresignedURLs,
   });
 };
 const createPlace = async (req, res, next) => {
