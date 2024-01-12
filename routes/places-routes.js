@@ -19,10 +19,10 @@ const authHandler = require("../middleware/authHandler");
 router.get("/:placeID", placesController.getPlaceById);
 router.get("/user/:userID", placesController.getPlacesByUserId);
 
+router.get("/", placesController.getAllPlaces);
 // the routes after this will require authentication with a valid token
 router.use(authHandler);
 
-router.get("/", placesController.getAllPlaces);
 router.post(
   "/",
   fileUpload.single("image"),
